@@ -71,12 +71,18 @@ class TFmini:
     @property
     def distance(self):
         """The most recent distance measurement in centimeters"""
+        try:
+            self._uart.reset_input_buffer()
+        except AttributeError:
+            # not implemented, we'll just keep going
+            pass
+
         # listen for new packet
         stamp = time.monotonic()
         while time.monotonic() - stamp < self.timeout:
             # look for the header start
             x = self._uart.read(1)
-            if x is None or x[0] != 0x59:
+            if not x or x[0] != 0x59:
                 continue
             # get remaining packet
             data = self._uart.read(8)
@@ -118,7 +124,7 @@ class TFmini:
         while (time.monotonic() - stamp) < self.timeout:
             # look for the header start
             x = self._uart.read(1)
-            if x is None or x[0] != 0x42:
+            if not x or x[0] != 0x42:
                 continue
             echo = self._uart.read(len(_STARTREPLY))
             #print("start ", [hex(i) for i in echo])

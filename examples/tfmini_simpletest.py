@@ -1,17 +1,21 @@
 import time
-import board
+import board  # comment this out if using pyserial
+import busio  # comment this out if using pyserial
 import adafruit_tfmini
 
 # Use hardware uart
-import busio
 uart = busio.UART(board.TX, board.RX)
+
+# Or, you can use pyserial on any computer
+#import serial
+#uart = serial.Serial("/dev/ttyS2", timeout=1)
 
 # Simplest use, connect with the uart bus object
 tfmini = adafruit_tfmini.TFmini(uart)
 
-# You can put in 'long distance' mode
-#tfmini.mode = adafruit_tfmini.MODE_LONG
-#print("Now in mode", tfmini.mode)
+# You can put in 'short' or 'long' distance mode
+tfmini.mode = adafruit_tfmini.MODE_SHORT
+print("Now in mode", tfmini.mode)
 
 while True:
     print("Distance: %d cm (strength %d, mode %x)" %
