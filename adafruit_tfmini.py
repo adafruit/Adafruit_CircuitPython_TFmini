@@ -57,9 +57,11 @@ MODE_LONG = 7
 class TFmini:
     """TF mini communication module, use with just RX or TX+RX for advanced
     command & control.
+    :param uart: the pyseral or busio.uart compatible uart device
+    :param timeout: how long we'll wait for valid data or response, in seconds. Default is 1
     """
-    
-    def __init__(self, uart, *, timeout=3):
+
+    def __init__(self, uart, *, timeout=1):
         self._uart = uart
         self._uart.baudrate = 115200
         self.timeout = timeout
@@ -73,31 +75,33 @@ class TFmini:
         stamp = time.monotonic()
         while time.monotonic() - stamp < self.timeout:
             # look for the header start
-            c = self._uart.read(1)
-            if c[0] != 0x59:
+            x = self._uart.read(1)
+            if x is None or x[0] != 0x59:
                 continue
             # get remaining packet
             data = self._uart.read(8)
             # check first byte is magicbyte
-            framebyte, distance, self._strength, self._mode, _, checksum = struct.unpack("<BHHBBB",data)
+            frame, dist, self._strength, self._mode, _, checksum = struct.unpack("<BHHBBB", data)
             # look for second 0x59 frame indicator
-            if framebyte != 0x59:
+            if frame != 0x59:
                 continue
             # calculate and check sum
             mysum = (sum(data[0:7]) + 0x59) & 0xFF
             if mysum != checksum:
                 continue
-            return distance
+            return dist
         raise RuntimeError("Timed out looking for valid data")
 
     @property
     def strength(self):
-        self.distance
+        """The signal validity, higher value means better measurement"""
+        _ = self.distance  # trigger distance measurement
         return self._strength
 
     @property
     def mode(self):
-        self.distance
+        """The measurement mode can be MODE_SHORT (2) or MODE_LONG (7)"""
+        _ = self.distance  # trigger distance measurement
         return self._mode
 
     @mode.setter
@@ -107,13 +111,15 @@ class TFmini:
         self._set_config(_CONFIGPARAM + bytes([0, 0, newmode, 0x11]))
 
     def _set_config(self, command):
+        """Manager for sending commands, put sensor into config mode, config,
+        then exit configuration mode!"""
         self._uart.write(_STARTCONFIG)
         stamp = time.monotonic()
         while (time.monotonic() - stamp) < self.timeout:
             # look for the header start
-            c = self._uart.read(1)
-            if c is None or c[0] != 0x42:
-               continue
+            x = self._uart.read(1)
+            if x is None or x[0] != 0x42:
+                continue
             echo = self._uart.read(len(_STARTREPLY))
             #print("start ", [hex(i) for i in echo])
             if echo != _STARTREPLY:
