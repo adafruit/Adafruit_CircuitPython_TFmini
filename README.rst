@@ -10,7 +10,7 @@ Introduction
     :alt: Discord
 
 .. image:: https://github.com/adafruit/Adafruit_CircuitPython_TFmini/workflows/Build%CI/badge.svg
-    :target: https://github.com/adafruit/Adafruit_CircuitPython_TFmini
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_TFmini/actions/
     :alt: Build Status
 
 A CircuitPython/Python library for Benewake's TF mini distance sensor
