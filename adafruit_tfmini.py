@@ -45,14 +45,15 @@ import struct
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TFmini.git"
 
-_STARTCONFIG = b'\x42\x57\x02\x00\x00\x00\x01\x02'
-_STARTREPLY = b'\x57\x02\x01\x00\x00\x01\x02'  # minus header 0x42
-_CONFIGPARAM = b'\x42\x57\x02\x00'
-_ENDCONFIG = b'\x42\x57\x02\x00\x00\x00\x00\x02'
-_ENDREPLY = b'\x42\x57\x02\x01\x00\x00\x00\x02'
+_STARTCONFIG = b"\x42\x57\x02\x00\x00\x00\x01\x02"
+_STARTREPLY = b"\x57\x02\x01\x00\x00\x01\x02"  # minus header 0x42
+_CONFIGPARAM = b"\x42\x57\x02\x00"
+_ENDCONFIG = b"\x42\x57\x02\x00\x00\x00\x00\x02"
+_ENDREPLY = b"\x42\x57\x02\x01\x00\x00\x00\x02"
 
 MODE_SHORT = 2
 MODE_LONG = 7
+
 
 class TFmini:
     """TF mini communication module, use with just RX or TX+RX for advanced
@@ -87,7 +88,9 @@ class TFmini:
             # get remaining packet
             data = self._uart.read(8)
             # check first byte is magicbyte
-            frame, dist, self._strength, self._mode, _, checksum = struct.unpack("<BHHBBB", data)
+            frame, dist, self._strength, self._mode, _, checksum = struct.unpack(
+                "<BHHBBB", data
+            )
             # look for second 0x59 frame indicator
             if frame != 0x59:
                 continue
@@ -127,24 +130,24 @@ class TFmini:
             if not x or x[0] != 0x42:
                 continue
             echo = self._uart.read(len(_STARTREPLY))
-            #print("start ", [hex(i) for i in echo])
+            # print("start ", [hex(i) for i in echo])
             if echo != _STARTREPLY:
                 raise RuntimeError("Did not receive config start echo")
             break
 
         # Finally, send the command
         self._uart.write(command)
-        #print([hex(i) for i in command])
+        # print([hex(i) for i in command])
         echo = self._uart.read(len(command))
         cmdreply = bytearray(len(command))
         cmdreply[:] = command
         cmdreply[3] = 0x1
-        #print("cmd ", [hex(i) for i in echo])
+        # print("cmd ", [hex(i) for i in echo])
         if echo != cmdreply:
             raise RuntimeError("Did not receive config command echo")
 
         self._uart.write(_ENDCONFIG)
         echo = self._uart.read(len(_ENDREPLY))
-        #print("end ", [hex(i) for i in echo])
+        # print("end ", [hex(i) for i in echo])
         if echo != _ENDREPLY:
             raise RuntimeError("Did not receive config end echo")
