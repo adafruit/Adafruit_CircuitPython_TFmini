@@ -41,6 +41,7 @@ MODE_LONG = 7
 class TFmini:
     """TF mini communication module, use with just RX or TX+RX for advanced
     command & control.
+
     :param uart: the pyseral or busio.uart compatible uart device
     :param timeout: how long we'll wait for valid data or response, in seconds. Default is 1
     """
