@@ -49,6 +49,7 @@ class TFmini:
     def __init__(self, uart, *, timeout=1):
         self._uart = uart
         self._uart.baudrate = 115200
+        self._uart.reset_input_buffer()
         self.timeout = timeout
         self._strength = None
         self._mode = None
