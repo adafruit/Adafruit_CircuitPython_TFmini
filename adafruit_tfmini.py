@@ -25,7 +25,7 @@ Implementation Notes
 import time
 import struct
 
-__version__ = "0.0.0-auto.0"
+__version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TFmini.git"
 
 _STARTCONFIG = b"\x42\x57\x02\x00\x00\x00\x01\x02"
