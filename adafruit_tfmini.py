@@ -25,6 +25,12 @@ Implementation Notes
 import time
 import struct
 
+try:
+    import typing  # pylint: disable=unused-import
+    from busio import UART
+except ImportError:
+    pass
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TFmini.git"
 
@@ -46,7 +52,7 @@ class TFmini:
     :param timeout: how long we'll wait for valid data or response, in seconds. Default is 1
     """
 
-    def __init__(self, uart, *, timeout=1):
+    def __init__(self, uart: UART, *, timeout: int = 1) -> None:
         self._uart = uart
         self._uart.baudrate = 115200
         self._uart.reset_input_buffer()
@@ -55,7 +61,7 @@ class TFmini:
         self._mode = None
 
     @property
-    def distance(self):
+    def distance(self) -> None:
         """The most recent distance measurement in centimeters"""
         try:
             self._uart.reset_input_buffer()
@@ -87,24 +93,24 @@ class TFmini:
         raise RuntimeError("Timed out looking for valid data")
 
     @property
-    def strength(self):
+    def strength(self) -> int:
         """The signal validity, higher value means better measurement"""
         _ = self.distance  # trigger distance measurement
         return self._strength
 
     @property
-    def mode(self):
+    def mode(self) -> int:
         """The measurement mode can be MODE_SHORT (2) or MODE_LONG (7)"""
         _ = self.distance  # trigger distance measurement
         return self._mode
 
     @mode.setter
-    def mode(self, newmode):
+    def mode(self, newmode: int) -> None:
         if not newmode in (MODE_LONG, MODE_SHORT):
             raise ValueError("Invalid mode")
         self._set_config(_CONFIGPARAM + bytes([0, 0, newmode, 0x11]))
 
-    def _set_config(self, command):
+    def _set_config(self, command: int) -> None:
         """Manager for sending commands, put sensor into config mode, config,
         then exit configuration mode!"""
         self._uart.write(_STARTCONFIG)
