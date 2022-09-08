@@ -107,7 +107,7 @@ class TFmini:
         return self._mode
 
     @mode.setter
-    def mode(self, newmode: Literal[MODE_LONG, MODE_SHORT]) -> None:
+    def mode(self, newmode: Literal[2, 7]) -> None:
         if not newmode in (MODE_LONG, MODE_SHORT):
             raise ValueError("Invalid mode")
         self._set_config(_CONFIGPARAM + bytes([0, 0, newmode, 0x11]))
