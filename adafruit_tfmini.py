@@ -27,6 +27,8 @@ import struct
 
 try:
     import typing  # pylint: disable=unused-import
+    from typing_extensions import Literal
+    from circuitpython_typing import ReadableBuffer
     from busio import UART
 except ImportError:
     pass
@@ -52,7 +54,7 @@ class TFmini:
     :param timeout: how long we'll wait for valid data or response, in seconds. Default is 1
     """
 
-    def __init__(self, uart: UART, *, timeout: int = 1) -> None:
+    def __init__(self, uart: UART, *, timeout: float = 1) -> None:
         self._uart = uart
         self._uart.baudrate = 115200
         self._uart.reset_input_buffer()
@@ -61,7 +63,7 @@ class TFmini:
         self._mode = None
 
     @property
-    def distance(self) -> None:
+    def distance(self) -> int:
         """The most recent distance measurement in centimeters"""
         try:
             self._uart.reset_input_buffer()
@@ -99,18 +101,18 @@ class TFmini:
         return self._strength
 
     @property
-    def mode(self) -> int:
+    def mode(self) -> Literal[2, 7]:
         """The measurement mode can be MODE_SHORT (2) or MODE_LONG (7)"""
         _ = self.distance  # trigger distance measurement
         return self._mode
 
     @mode.setter
-    def mode(self, newmode: int) -> None:
+    def mode(self, newmode: Literal[MODE_LONG, MODE_SHORT]) -> None:
         if not newmode in (MODE_LONG, MODE_SHORT):
             raise ValueError("Invalid mode")
         self._set_config(_CONFIGPARAM + bytes([0, 0, newmode, 0x11]))
 
-    def _set_config(self, command: int) -> None:
+    def _set_config(self, command: ReadableBuffer) -> None:
         """Manager for sending commands, put sensor into config mode, config,
         then exit configuration mode!"""
         self._uart.write(_STARTCONFIG)
