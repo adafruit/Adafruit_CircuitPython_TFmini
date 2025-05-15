@@ -22,14 +22,15 @@ Implementation Notes
 
 """
 
-import time
 import struct
+import time
 
 try:
-    import typing  # pylint: disable=unused-import
-    from typing_extensions import Literal
-    from circuitpython_typing import ReadableBuffer
+    import typing
+
     from busio import UART
+    from circuitpython_typing import ReadableBuffer
+    from typing_extensions import Literal
 except ImportError:
     pass
 
@@ -81,9 +82,7 @@ class TFmini:
             # get remaining packet
             data = self._uart.read(8)
             # check first byte is magicbyte
-            frame, dist, self._strength, self._mode, _, checksum = struct.unpack(
-                "<BHHBBB", data
-            )
+            frame, dist, self._strength, self._mode, _, checksum = struct.unpack("<BHHBBB", data)
             # look for second 0x59 frame indicator
             if frame != 0x59:
                 continue
@@ -108,7 +107,7 @@ class TFmini:
 
     @mode.setter
     def mode(self, newmode: Literal[2, 7]) -> None:
-        if not newmode in (MODE_LONG, MODE_SHORT):
+        if newmode not in {MODE_LONG, MODE_SHORT}:
             raise ValueError("Invalid mode")
         self._set_config(_CONFIGPARAM + bytes([0, 0, newmode, 0x11]))
 

@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
+
 import board  # comment this out if using pyserial
 import busio  # comment this out if using pyserial
+
 import adafruit_tfmini
 
 # Use hardware uart
@@ -22,7 +24,6 @@ print("Now in mode", tfmini.mode)
 
 while True:
     print(
-        "Distance: %d cm (strength %d, mode %x)"
-        % (tfmini.distance, tfmini.strength, tfmini.mode)
+        "Distance: %d cm (strength %d, mode %x)" % (tfmini.distance, tfmini.strength, tfmini.mode)
     )
     time.sleep(0.1)
