@@ -23,7 +23,5 @@ tfmini.mode = adafruit_tfmini.MODE_SHORT
 print("Now in mode", tfmini.mode)
 
 while True:
-    print(
-        "Distance: %d cm (strength %d, mode %x)" % (tfmini.distance, tfmini.strength, tfmini.mode)
-    )
+    print(f"Distance: {tfmini.distance:d} cm (strength {tfmini.strength:d}, mode {tfmini.mode:x})")
     time.sleep(0.1)
